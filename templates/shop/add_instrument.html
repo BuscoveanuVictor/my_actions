@@ -1,0 +1,158 @@
+
+{% block content %}
+<div class="form-container">
+    <h2>Adaugă un instrument nou</h2>
+    
+    <form method="POST" class="instrument-form">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+        <div class="error-message">
+            {% for error in form.non_field_errors %}
+                <p>{{ error }}</p>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% for field in form %}
+        <div class="form-group">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            
+            {% if field.help_text %}
+            <small class="help-text">{{ field.help_text }}</small>
+            {% endif %}
+            
+            {% if field.errors %}
+            <div class="field-errors">
+                {% for error in field.errors %}
+                    <p class="error">{{ error }}</p>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+
+        <div class="form-actions">
+            <button type="submit" class="submit-btn">Adaugă instrument</button>
+            <a href="{% url 'shop:shop' %}" class="cancel-btn">Anulează</a>
+        </div>
+    </form>
+</div>
+
+<style>
+    .form-container {
+        max-width: 600px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+        color: #333;
+        margin-bottom: 1.5rem;
+        text-align: center;
+    }
+
+    .instrument-form {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .form-group {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    label {
+        font-weight: bold;
+        color: #555;
+    }
+
+    input, textarea {
+        padding: 0.8rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+        font-size: 1rem;
+    }
+
+    textarea {
+        min-height: 120px;
+    }
+
+    .help-text {
+        color: #666;
+        font-size: 0.9rem;
+        font-style: italic;
+    }
+
+    .error-message, .field-errors {
+        background-color: #fff3f3;
+        color: #dc3545;
+        padding: 0.5rem;
+        border-radius: 4px;
+        margin-top: 0.5rem;
+    }
+
+    .error {
+        margin: 0;
+        font-size: 0.9rem;
+    }
+
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 1rem;
+    }
+
+    .submit-btn, .cancel-btn {
+        padding: 0.8rem 1.5rem;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: bold;
+        text-decoration: none;
+        text-align: center;
+        transition: background-color 0.3s;
+    }
+
+    .submit-btn {
+        background-color: #007bff;
+        color: white;
+        flex: 2;
+    }
+
+    .submit-btn:hover {
+        background-color: #0056b3;
+    }
+
+    .cancel-btn {
+        background-color: #6c757d;
+        color: white;
+        flex: 1;
+    }
+
+    .cancel-btn:hover {
+        background-color: #545b62;
+    }
+
+    @media (max-width: 768px) {
+        .form-container {
+            margin: 1rem;
+            padding: 1rem;
+        }
+
+        .form-actions {
+            flex-direction: column;
+        }
+
+        .submit-btn, .cancel-btn {
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}

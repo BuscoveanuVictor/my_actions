@@ -1,0 +1,91 @@
+
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/shop.css' %}">
+
+<div class="shop-container">
+    <aside class="filters-sidebar">
+        <h2>Filtre</h2>
+        <form id="filterForm" method="get">
+            {{ form.non_field_errors }}
+            
+            <div class="filter-section">
+                <h3>Căutare după model</h3>
+                {{ form.model }}
+                {{ form.model.errors }}
+            </div>
+
+            <div class="filter-section">
+                <h3>Interval preț</h3>
+                <div class="price-inputs">
+                    {{ form.min_price }}
+                    <span>-</span>
+                    {{ form.max_price }}
+                </div>
+                {{ form.min_price.errors }}
+                {{ form.max_price.errors }}
+            </div>
+
+            <div class="filter-section">
+                <h3>Categorie</h3>
+                {{ form.category }}
+                {{ form.category.errors }}
+            </div>
+
+            <div class="filter-section">
+                <h3>Tip</h3>
+                {{ form.type }}
+                {{ form.type.errors }}
+            </div>
+
+            <div class="filter-section">
+                <h3>Rating minim</h3>
+                {{ form.min_rating }}
+                {{ form.min_rating.errors }}
+            </div>
+
+            <div class="filter-section">
+                <h3>Sortare</h3>
+                {{ form.sort }}
+                {{ form.sort.errors }}
+            </div>
+
+            <button type="submit" class="filter-button">Aplică filtrele</button>
+        </form>
+    </aside>
+
+    <main class="products-container">
+        <div class="products-grid" id="productsGrid">
+            {% include 'shop/products_list.html' %}
+        </div>
+    </main>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('filterForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const queryString = new URLSearchParams(formData).toString();
+    
+    fetch(`?${queryString}`, {
+        method: "GET",
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('productsGrid').innerHTML = data.html;
+        history.pushState({}, '', `?${queryString}`);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+    });
+});
+</script>
+{% endblock %}

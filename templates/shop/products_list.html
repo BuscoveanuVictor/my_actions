@@ -1,0 +1,210 @@
+
+<div class="products-grid">
+    {% for product in products %}
+    <div class="product-card">
+        <a href="/product/{{ product.instrument_id }}/" class="product-link">
+            <div class="product-image">
+                {% for image in product.images.all %}
+                    {% if image.path %}
+                        <img src="/{{ image.path }}" alt="{{ product.name }}">
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            <div class="product-info">
+                <h3>{{ product.name }}</h3>
+                <p class="price">{{ product.price }} lei</p>
+                <p class="stock-info">În stoc: {{ product.stock }}</p>
+            </div>
+        </a>
+
+        <div class="product-actions">
+            <span id="cart-status-{{ product.instrument_id }}" style="display: none;">
+                Adăugat în coș
+            </span>
+            <br>
+            <div class="quantity-controls" data-product-id="{{ product.instrument_id }}">
+                <button class="btn-decrease">-</button>
+                <input type="number" 
+                        class="quantity-input" 
+                        value="1"
+                        min="1" 
+                        max="{{ product.stock }}"
+                >
+                <button class="btn-increase">+</button>
+            </div>    
+            <button class="btn-add-to-cart" data-product-id="{{ product.instrument_id }}">
+                <i class="fas fa-shopping-cart"></i>
+                Adaugă în coș
+            </button>
+            
+            {% if product.stock <= 0 %}
+                <span class="out-of-stock">Stoc epuizat</span>
+            {% endif %}
+        </div>
+    </div>
+    {% empty %}
+    <div class="no-products">
+        <p>Nu există produse disponibile momentan.</p>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+
+function addToLocalCart(productId, quantity) {
+    let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    
+    // Verificăm dacă produsul există deja în coș
+    const existingProduct = cart.find(item => item.id === productId);
+    
+    if (existingProduct) {
+        existingProduct.quantity = existingProduct.quantity + quantity;
+    } else {
+        cart.push({
+            id: productId,
+            quantity: parseInt(quantity)
+        });
+    }
+    
+    localStorage.setItem('cart', JSON.stringify(cart));
+    document.getElementById(`cart-status-${productId}`).style.display = 'block';
+}
+
+document.querySelectorAll('.btn-add-to-cart').forEach(button => {
+    button.addEventListener('click', function() {
+        const productId = this.dataset.productId;
+        const quantity = document.querySelector(`.quantity-controls[data-product-id="${productId}"]`).querySelector('.quantity-input').value;
+        addToLocalCart(productId, quantity);
+        console.log(productId, quantity);
+    });
+});
+
+function isInCart(){
+        var cart = JSON.parse(localStorage.getItem('cart'));
+        for (let i = 0; i < cart.length; i++){
+            if (cart[i]!=null){
+                document.getElementById(`cart-status-${cart[i].id}`).style.display = 'block';
+            }
+        }
+     
+    }
+window.addEventListener('pageshow', function(event) {isInCart();});
+   
+
+
+document.addEventListener('DOMContentLoaded', function() {
+        
+    // Gestionare butoane cantitate
+    document.querySelectorAll('.quantity-controls').forEach(control => {
+        const decreaseBtn = control.querySelector('.btn-decrease');
+        const increaseBtn = control.querySelector('.btn-increase');
+        const input = control.querySelector('.quantity-input');
+        
+        decreaseBtn.addEventListener('click', () => {
+            let value = parseInt(input.value);
+            if (value > 1) {
+                input.value = value - 1;
+            }
+        });
+
+    
+        
+        increaseBtn.addEventListener('click', () => {
+            let value = parseInt(input.value);
+            let max = parseInt(input.getAttribute('max'));
+            if (value < max) {
+                input.value = value + 1;
+            }
+        });
+    });
+
+    // // Gestionare adăugare în coș
+    // document.querySelectorAll('.btn-add-to-cart').forEach(button => {
+    //     button.addEventListener('click', function() {
+    //         const productId = this.dataset.productId;
+    //         const quantityControl = document.querySelector(`.quantity-controls[data-product-id="${productId}"]`);
+    //         const quantity = quantityControl.querySelector('.quantity-input').value;
+            
+    //         console.log(productId, quantity);
+    //         fetch('/cart/add/', {
+    //             method: 'POST',
+    //             headers: {
+    //                 'Content-Type': 'application/json',
+    //                 'X-CSRFToken': getCookie('csrftoken')
+    //             },
+    //             body: JSON.stringify({
+    //                 product_id: productId,
+    //                 quantity: quantity
+    //             })
+    //         })
+    //         .then(response => response.json())
+    //         .then(data => {
+    //             if (data.success) {
+    //                 alert('Produsul a fost adăugat în coș!');
+    //             } else {
+    //                 alert('A apărut o eroare. Vă rugăm încercați din nou.');
+    //             }
+    //         });
+    //     });
+    // });
+
+    // Funcție pentru obținerea token-ului CSRF
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+});
+    
+    document.getElementById('filterForm').addEventListener('submit', function(e) {
+        e.preventDefault();
+      
+        const filters = {
+            model: document.getElementById('id_model').value,
+            min_price: document.getElementById('id_min_price').value,
+            max_price: document.getElementById('id_max_price').value,
+            category: document.getElementById('id_category').value,
+            type: document.getElementById('id_type').value,
+            min_rating: document.getElementById('id_min_rating').value,
+            sort: document.getElementById('id_sort').value
+        };
+        
+        const queryParams = [];
+        for (const [key, value] of Object.entries(filters)) {
+            if (value) { 
+                queryParams.push(`${key}=${encodeURIComponent(value)}`);
+            }
+        }
+        const queryString = queryParams.join('&');
+        const url = queryString ? `?${queryString}` : '';
+    
+        console.log(url);
+    
+        fetch(`${url}`, {
+            method: "GET",
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            console.log(data.html);
+            document.getElementById('productsGrid').innerHTML = data.html;
+            history.pushState({}, '', `?${queryString}`);
+        })
+        .catch(error => {
+            console.error('Error:', error);
+        });
+    });
+    </script>
+    

@@ -1,0 +1,340 @@
+
+<style>
+    .instrument-detail-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .instrument-content {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 3rem;
+    }
+    
+    /* Galerie imagini */
+    .instrument-gallery {
+        position: sticky;
+        top: 2rem;
+    }
+    
+    .main-image {
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        overflow: hidden;
+    }
+    
+    .main-image img {
+        width: 100%;
+        height: auto;
+        object-fit: cover;
+    }
+    
+    .thumbnail-gallery {
+        display: flex;
+        gap: 1rem;
+        overflow-x: auto;
+        padding: 0.5rem 0;
+    }
+    
+    .thumbnail {
+        width: 80px;
+        height: 80px;
+        border-radius: 4px;
+        overflow: hidden;
+        cursor: pointer;
+        opacity: 0.7;
+        transition: opacity 0.3s;
+    }
+    
+    .thumbnail.active {
+        opacity: 1;
+        border: 2px solid #007bff;
+    }
+    
+    .thumbnail img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    /* Informații instrument */
+    .instrument-info h1 {
+        margin: 0 0 1rem 0;
+        font-size: 2rem;
+    }
+    
+    .price-section {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .price {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #28a745;
+    }
+    
+    .stock {
+        padding: 0.5rem 1rem;
+        border-radius: 4px;
+        font-weight: 500;
+    }
+    
+    .in-stock {
+        background: #d4edda;
+        color: #155724;
+    }
+    
+    .out-of-stock {
+        background: #f8d7da;
+        color: #721c24;
+    }
+    
+    .rating {
+        margin-bottom: 1.5rem;
+    }
+    
+    .rating i {
+        color: #ffc107;
+    }
+    
+    /* Controale coș */
+    .cart-controls {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
+    
+    .quantity-controls {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .quantity-input {
+        width: 60px;
+        text-align: center;
+        padding: 0.5rem;
+        border: 1px solid #ddd;
+        border-radius: 4px;
+    }
+    
+    .btn-decrease,
+    .btn-increase {
+        width: 30px;
+        height: 30px;
+        border-radius: 50%;
+        border: none;
+        background: #f0f0f0;
+        cursor: pointer;
+    }
+    
+    .btn-add-to-cart {
+        padding: 0.75rem 1.5rem;
+        background: #007bff;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    /* Categorie și descriere */
+    .category-info {
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background: #f8f9fa;
+        border-radius: 4px;
+    }
+    
+    .category-info .label {
+        font-weight: bold;
+        margin-right: 0.5rem;
+    }
+    
+    .description h2 {
+        font-size: 1.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .description-content {
+        line-height: 1.6;
+        color: #666;
+    }
+    
+    @media (max-width: 768px) {
+        .instrument-content {
+            grid-template-columns: 1fr;
+            gap: 2rem;
+        }
+    
+        .instrument-gallery {
+            position: static;
+        }
+    
+        .cart-controls {
+            flex-direction: column;
+        }
+    
+        .btn-add-to-cart {
+            width: 100%;
+            justify-content: center;
+        }
+    }
+    </style>
+    
+
+{% block content %}
+<div class="instrument-detail-container">
+    <div class="instrument-content">
+        <!-- Galeria de imagini -->
+        <div class="instrument-gallery">
+            <div class="main-image">
+                {% if instrument.images.exists %}
+                    {% for img in instrument.images.all %}
+                        <img src="/{{ img.path }}" alt="{{ instrument.model }}" id="mainImage">
+                    {% endfor %}
+                {% endif %}
+            </div>
+            
+            {% if instrument.images.count > 1 %}
+            <div class="thumbnail-gallery">
+                {% for img in instrument.images.all %}
+                <div class="thumbnail {% if forloop.first %}active{% endif %}">
+                    <img src="{{ img.image.url }}" alt="{{ instrument.model }}" 
+                         onclick="changeMainImage(this.src)">
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Detalii instrument -->
+        <div class="instrument-info">
+            <h1>{{ instrument.model }}</h1>
+            
+            <div class="price-section">
+                <span class="price">{{ instrument.price }} LEI</span>
+                {% if instrument.stock > 0 %}
+                    <span class="stock in-stock">În stoc ({{ instrument.stock }} buc)</span>
+                {% else %}
+                    <span class="stock out-of-stock">Stoc epuizat</span>
+                {% endif %}
+            </div>
+
+            {% if instrument.rating %}
+            <div class="rating">
+                {% for i in "12345" %}
+                    {% if forloop.counter <= instrument.rating %}
+                        <i class="fas fa-star"></i>
+                    {% else %}
+                        <i class="far fa-star"></i>
+                    {% endif %}
+                {% endfor %}
+                <span>({{ instrument.rating }})</span>
+            </div>
+            {% endif %}
+
+            <!-- Controale coș -->
+            {% if instrument.stock > 0 %}
+            <div class="cart-controls">
+                <div class="quantity-controls">
+                    <button class="btn-decrease" id="btnDecrease">-</button>
+                    <input type="number" 
+                           class="quantity-input" 
+                           value="1"
+                           min="1" 
+                           max="{{ instrument.stock }}"
+                    >
+                    <button class="btn-increase" id="btnIncrease">+</button>
+                </div>
+                <button class="btn-add-to-cart" data-product-id="{{ instrument.id }}">
+                    <i class="fas fa-shopping-cart"></i>
+                    Adaugă în coș
+                </button>
+            </div>
+            {% endif %}
+
+            <!-- Categorie -->
+            <div class="category-info">
+                <span class="label">Categorie:</span>
+                <span class="value">{{ instrument.category.instrument }} - {{ instrument.category.get_type_display }}</span>
+            </div>
+
+            <!-- Descriere -->
+            {% if instrument.description %}
+            <div class="description">
+                <h2>Descriere</h2>
+                <div class="description-content">
+                    {{ instrument.description|linebreaks }}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+<script>
+
+document.addEventListener('DOMContentLoaded', function() {
+    const quantityInput = document.querySelector('.quantity-input');
+    const btnDecrease = document.querySelector('.btn-decrease');
+    const btnIncrease = document.querySelector('.btn-increase');
+    const btnAddToCart = document.querySelector('.btn-add-to-cart');
+    const maxStock = {{ instrument.stock }};
+    const productId = {{ instrument.instrument_id }};
+
+
+    btnDecrease.addEventListener('click', () => {
+        console.log('ceva');
+        const currentValue = parseInt(quantityInput.value);
+        if (currentValue > 1) {
+            quantityInput.value = currentValue - 1;
+        }
+    });
+
+    btnIncrease.addEventListener('click', () => {
+        const currentValue = parseInt(quantityInput.value);
+        if (currentValue < maxStock) {
+            quantityInput.value = currentValue + 1;
+        }
+    });
+
+
+    quantityInput.addEventListener('change', () => {
+        let value = parseInt(quantityInput.value);
+        if (value < 1) value = 1;
+        if (value > maxStock) value = maxStock;
+        quantityInput.value = value;
+    });
+
+    btnAddToCart.addEventListener('click', () => {
+        const quantity = parseInt(quantityInput.value);
+        var cart = JSON.parse(localStorage.getItem('cart'));
+        if (cart === null){
+            cart = [];
+        }
+
+        item = {
+            id: {{ instrument.instrument_id }},
+            name: '{{ instrument.model }}',
+            price: {{ instrument.price }},
+            quantity: quantity
+        };  
+       
+        cart[cart.length+1] = item;
+        console.log(cart);
+
+        localStorage.removeItem('cart');
+        localStorage.setItem('cart', JSON.stringify(cart));
+        alert('Produsul a fost adăugat în coș!');
+    });
+});
+</script>

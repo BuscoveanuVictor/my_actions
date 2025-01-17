@@ -1,0 +1,143 @@
+{% block content %}
+<div class="cart-container">
+    <div class="sort-controls">
+        <button onclick="sortItems('name')">Sortează după nume</button>
+        <button onclick="sortItems('price')">Sortează după preț</button>
+    </div>
+
+    <div class="cart-items">
+    </div>
+
+    <div class="cart-summary">
+      
+    </div>
+    
+</div>
+{% endblock %}
+
+
+{% block extra_js %}
+<script>
+function getCookie(name) {
+    const value = `; ${document.cookie}`;
+    const parts = value.split(`; ${name}=`);
+    return parts.pop().split(';').shift();
+}
+    
+function procesOrder() {
+    let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+    
+    if (cartItems.length === 0) {
+        alert('Coșul este gol!');
+        return;
+    }
+
+    cartItems = cartItems.filter(item => item !== null);
+
+    console.log('Cart items before sending:', cartItems);
+    
+    fetch('/cart/process-order/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(cartItems)
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log('Server response:', data);
+        if (data.success) {
+            localStorage.removeItem('cart');
+            loadCartFromLocalStorage();
+            alert('Comanda a fost procesată cu succes! Veți primi factura pe email.');
+        } else {
+            alert('A apărut o eroare: ' + data.error);
+        }
+    })
+    .catch(error => {
+        console.error('Error details:', error);
+        alert('A apărut o eroare la procesarea comenzii.');
+    });
+}
+
+    
+function sortItems(criteria) {
+    const container = document.querySelector('.cart-items');
+    const items = Array.from(container.getElementsByClassName('cart-item'));
+    
+    items.sort((a, b) => {
+        if (criteria === 'name') {
+            const nameA = a.dataset.name.toLowerCase();
+            const nameB = b.dataset.name.toLowerCase();
+            return nameA.localeCompare(nameB);
+        } else if (criteria === 'price') {
+            const priceA = parseFloat(a.dataset.price);
+            const priceB = parseFloat(b.dataset.price);
+            return priceA - priceB;
+        }
+    });
+    
+    // Golim containerul și readăugăm elementele sortate
+    container.innerHTML = '';
+    items.forEach(item => container.appendChild(item));
+}
+
+function removeFromCart(productName) {
+    let cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+    cartItems = cartItems.filter(item => item && item.name !== productName);
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+    loadCartFromLocalStorage(); // Reîncărcăm coșul pentru a actualiza afișarea
+}
+
+
+function loadCartFromLocalStorage() {
+    const cartItems = JSON.parse(localStorage.getItem('cart')) || [];
+    const container = document.querySelector('.cart-items');
+    container.innerHTML = ''; 
+    
+    console.log('Cart items before sending:', cartItems);
+    let totalPrice = 0;
+    let totalItems = 0;
+
+    cartItems.forEach(item => {
+        if(item !== null){
+            // Convertim id în instrument_id dacă există
+            if (item.id && !item.instrument_id) {
+                item.instrument_id = item.id;
+                delete item.id;
+            }
+            
+            totalItems += item.quantity;
+            const itemTotal = item.price * item.quantity;
+            totalPrice += itemTotal;
+
+            const itemHTML = `
+            <div class="cart-item" data-price="${itemTotal}" data-name="${item.name}">
+                <div class="cart-item-header">
+                    <h3>${item.name}</h3>
+                    <button class="remove-item" onclick="removeFromCart('${item.name}')">✕</button>
+                </div>
+                <p>Preț unitar: ${item.price} lei</p>
+                <p>Cantitate: ${item.quantity}</p>
+                <p>Total: ${itemTotal} lei</p>
+            </div>
+        `;
+        container.innerHTML += itemHTML;
+        }
+    });
+
+    // Salvăm înapoi în localStorage cu structura corectată
+    localStorage.setItem('cart', JSON.stringify(cartItems));
+
+    document.querySelector('.cart-summary').innerHTML = `
+        <p>Total produse: ${totalItems}</p>
+        <p>Preț total: ${totalPrice} lei</p>
+        <button onclick="procesOrder()" class="buy-button">Cumpără</button>
+    `;
+}
+
+// Încărcăm coșul când pagina se încarcă
+document.addEventListener('DOMContentLoaded', loadCartFromLocalStorage);
+</script>
+{% endblock %}

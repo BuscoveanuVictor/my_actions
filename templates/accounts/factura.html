@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body { font-family: Arial, sans-serif; }
+        .header { margin-bottom: 20px; }
+        .product-table { width: 100%; border-collapse: collapse; }
+        .product-table th, .product-table td { border: 1px solid #ddd; padding: 8px; }
+        .total { margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Factură</h1>
+        <p>Data: {{ comanda.data_comanda|date:"d/m/Y H:i" }}</p>
+        <p>Număr comandă: {{ comanda.id }}</p>
+    </div>
+
+    <div class="client-info">
+        <h2>Date client:</h2>
+        <p>Nume: {{ user.first_name }} {{ user.last_name }}</p>
+        <p>Email: {{ user.email }}</p>
+    </div>
+
+    <table class="product-table">
+        <thead>
+            <tr>
+                <th>Produs</th>
+                <th>Cantitate</th>
+                <th>Preț unitar</th>
+                <th>Total</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for detaliu in comanda.detalii.all %}
+            <tr>
+                <td>
+                    {{ detaliu.produs.nume }}
+                    <br>
+                    <small>Link: {{ request.scheme }}://{{ request.get_host }}{% url 'product_detail' detaliu.produs.id %}</small>
+                </td>
+                <td>{{ detaliu.cantitate }}</td>
+                <td>{{ detaliu.pret_unitar }} lei</td>
+                <td>{{ detaliu.pret_unitar|multiply:detaliu.cantitate }} lei</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+
+    <div class="total">
+        <h3>Total comandă: {{ comanda.total }} lei</h3>
+    </div>
+
+    <div class="footer">
+        <p>Pentru orice nelămuriri, vă rugăm să ne contactați la: {{ admin_email }}</p>
+    </div>
+</body>
+</html>

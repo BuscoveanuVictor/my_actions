@@ -1,0 +1,124 @@
+<style>
+    /* Stiluri pentru containerul principal */
+.container {
+    max-width: 600px;
+    margin: 3rem auto;
+    padding: 2rem;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(0, 0, 0, 0.1);
+}
+
+/* Stiluri pentru titlu */
+h2 {
+    color: #2c3e50;
+    text-align: center;
+    margin-bottom: 2rem;
+    font-weight: 600;
+    position: relative;
+    padding-bottom: 10px;
+}
+
+h2:after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 60px;
+    height: 3px;
+    background-color: #0d6efd;
+}
+
+/* Stiluri pentru formular */
+form {
+    padding: 1rem;
+}
+
+/* Stiluri pentru paragrafele din formular */
+form p {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+/* Stiluri pentru label-uri */
+form label {
+    display: block;
+    margin-bottom: 0.5rem;
+    color: #495057;
+    font-weight: 500;
+}
+
+/* Stiluri pentru input-uri */
+form input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+form input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    outline: none;
+}
+
+/* Stiluri pentru mesaje de eroare */
+.errorlist {
+    list-style: none;
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin: 5px 0 0;
+    padding: 0;
+}
+
+/* Stiluri pentru butonul de înregistrare */
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    font-size: 1.1rem;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-top: 1rem;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+}
+
+/* Stiluri pentru help text */
+.helptext {
+    display: block;
+    font-size: 0.875rem;
+    color: #6c757d;
+    margin-top: 5px;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+    .container {
+        margin: 1rem;
+        padding: 1rem;
+    }
+    
+    h2 {
+        font-size: 1.5rem;
+    }
+}
+</style>
+
+{% block content %}
+<div class="container mt-4">
+    <h2>Înregistrare</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Înregistrare</button>
+    </form>
+</div>
+{% endblock %}

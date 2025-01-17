@@ -1,0 +1,15 @@
+{% block content %}
+    {% if user.is_authenticated %}
+        <p>Salut {{ user.username }}</p>
+    {% else %}
+        <p>Salut preastimate anonim</p>
+    {% endif %}
+
+    <h1>{% if titlu %}{{ titlu }}{% else %}Eroare 403{% endif %}</h1>
+
+    {% if mesaj_personalizat %}
+        <p>{{ mesaj_personalizat }}</p>
+    {% else %}
+        <p>Ne pare rău, nu aveți permisiunea de a accesa această resursă.</p>
+    {% endif %}
+{% endblock %}

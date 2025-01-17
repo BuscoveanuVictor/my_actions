@@ -1,0 +1,15 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Confirmare Email</title>
+</head>
+<body>
+    <img src="cid:logo" alt="Logo" style="max-width: 200px;">
+    <h2>Bun venit pe site-ul nostru!</h2>
+    <p>Dragă {{ user.first_name }} {{ user.last_name }} ({{ user.username }}),</p>
+    <p>Îți mulțumim pentru înregistrare! Te rugăm să confirmi adresa ta de email accesând link-ul de mai jos:</p>
+    <p>
+        <a href="{{ confirmation_link }}">Confirmă email-ul</a>
+    </p>
+</body>
+</html>

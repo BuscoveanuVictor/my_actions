@@ -1,0 +1,55 @@
+{% block content %}
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">Profilul meu</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Nume utilizator:</strong></div>
+                        <div class="col-sm-8">{{ user.username }}</div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Nume:</strong></div>
+                        <div class="col-sm-8">{{ user.first_name }} {{ user.last_name }}</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Email:</strong></div>
+                        <div class="col-sm-8">{{ user.email }}</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Telefon:</strong></div>
+                        <div class="col-sm-8">{{ user.telefon }}</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Adresa:</strong></div>
+                        <div class="col-sm-8">{{ user.adresa }}</div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-sm-4"><strong>Data nașterii:</strong></div>
+                        <div class="col-sm-8">{{ user.data_nasterii }}</div>
+                    </div>
+
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'password_change' %}" class="btn btn-warning">
+                            Schimbă parola
+                        </a>
+                        <a href="{% url 'logout' %}" class="btn btn-danger">
+                            Deconectare
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

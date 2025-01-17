@@ -1,0 +1,101 @@
+<style>
+    .container {
+    margin-top: 5rem;
+}
+
+/* Stiluri pentru formular */
+form {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Stiluri pentru titlu */
+h2 {
+    color: #333;
+    font-weight: 600;
+    margin-bottom: 2rem;
+}
+
+/* Stiluri pentru input-uri */
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-group input:focus {
+    border-color: #0d6efd;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25);
+    outline: none;
+}
+
+/* Stiluri pentru butonul de autentificare */
+.btn-primary {
+    padding: 12px;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    transition: all 0.3s ease;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(13, 110, 253, 0.3);
+}
+
+/* Stiluri pentru checkbox */
+.form-check-label {
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* Stiluri pentru mesaje de eroare */
+.alert {
+    border-radius: 5px;
+    margin-bottom: 1.5rem;
+}
+
+.alert-danger {
+    background-color: #fff2f2;
+    border-color: #ffcfcf;
+    color: #dc3545;
+}
+</style>
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="text-center mb-4">Autentificare</h2>
+            {% if messages %}
+                <div class="alert alert-danger">
+                    {% for message in messages %}
+                        <p>{{ message }}</p>
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <form method="post">
+                {% csrf_token %}
+                <div class="form-group mb-3">
+                    {{ form.username }}
+                </div>
+                <div class="form-group mb-3">
+                    {{ form.password }}
+                </div>
+                <div class="form-check mb-3">
+                    {{ form.remember_me }}
+                    <label class="form-check-label" for="{{ form.remember_me.id_for_label }}">
+                        Tine-ma minte
+                    </label>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Autentificare</button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

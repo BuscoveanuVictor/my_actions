@@ -1,0 +1,72 @@
+{% load static %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/shop.css' %}">
+
+<div class="shop-container">
+
+    <div class="products-container">
+        {% include 'shop/products_list.html' %}
+    </div>
+
+   
+
+    <div class="filters-sidebar">
+
+     
+        <h2>Filtre</h2>
+            <form id="filterForm" method="get">
+                {{ form.non_field_errors }}
+                
+                <div class="filter-section">
+                    <h3>Căutare după model</h3>
+                    {{ form.model }}
+                    {{ form.model.errors }}
+                </div>
+
+                <div class="filter-section">
+                    <h3>Interval preț</h3>
+                    <div class="price-inputs">
+                        {{ form.min_price }}
+                        <span>-</span>
+                        {{ form.max_price }}
+                    </div>
+                    {{ form.min_price.errors }}
+                    {{ form.max_price.errors }}
+                </div>
+
+                <div class="filter-section">
+                    <h3>Categorie</h3>
+                    {{ form.category }}
+                    {{ form.category.errors }}
+                </div>
+
+                <div class="filter-section">
+                    <h3>Tip</h3>
+                    {{ form.type }}
+                    {{ form.type.errors }}
+                </div>
+
+                <div class="filter-section">
+                    <h3>Rating minim</h3>
+                    {{ form.min_rating }}
+                    {{ form.min_rating.errors }}
+                </div>
+
+                <div class="filter-section">
+                    <h3>Sortare</h3>
+                    {{ form.sort }}
+                    {{ form.sort.errors }}
+                </div>
+
+                <button type="submit" class="filter-button">Aplică filtrele</button>
+            </form>
+
+          
+            <br>
+            <a href="/cart/" class="cart-button">
+                <i class="fas fa-shopping-cart"></i>
+                Vezi coșul
+                <span class="cart-count" id="cartItemCount">0</span>
+            </a>
+    </div>
+</div>
+
